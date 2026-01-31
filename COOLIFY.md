@@ -22,7 +22,7 @@ Add the following Environment Variables:
 | Key | Value | Description |
 | :--- | :--- | :--- |
 | `OPENCLAW_GATEWAY_TOKEN` | `<random_hex_string>` | Generate a secure random string (e.g. `openssl rand -hex 32`). This is your API Key. |
-| `NODE_ENV` | `production` | Ensures production optimizations. |
+| `NODE_ENV` | `production` | Ensures production optimizations. **Note:** The Dockerfile now automatically handles build-time dependencies, so you don't strictly need to uncheck "Available at Build Time" for this var, but it's good practice. |
 
 ### Storage (Persistent Volumes)
 To preserve your sessions (WhatsApp login) and config across restarts, you **MUST** configure persistent storage.
