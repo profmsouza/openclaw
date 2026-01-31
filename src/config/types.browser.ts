@@ -7,6 +7,8 @@ export type BrowserProfileConfig = {
   driver?: "openclaw" | "extension";
   /** Profile color (hex). Auto-assigned at creation. */
   color: string;
+  /** Proxy URL to use for this profile. override global setting. */
+  proxy?: string;
 };
 export type BrowserSnapshotDefaults = {
   /** Default snapshot mode (applies when mode is not provided). */
@@ -38,4 +40,6 @@ export type BrowserConfig = {
   profiles?: Record<string, BrowserProfileConfig>;
   /** Default snapshot options (applied by the browser tool/CLI when unset). */
   snapshotDefaults?: BrowserSnapshotDefaults;
+  /** Global proxy URL for all profiles (unless overridden). */
+  proxy?: string;
 };

@@ -92,6 +92,8 @@ export type WhatsAppConfig = {
   debounceMs?: number;
   /** Heartbeat visibility settings for this channel. */
   heartbeat?: ChannelHeartbeatVisibilityConfig;
+  /** Proxy URL (e.g. http://user:pass@host:port) to use for WhatsApp connection. */
+  proxy?: string;
 };
 
 export type WhatsAppAccountConfig = {
@@ -158,4 +160,6 @@ export type WhatsAppAccountConfig = {
   debounceMs?: number;
   /** Heartbeat visibility settings for this account. */
   heartbeat?: ChannelHeartbeatVisibilityConfig;
+  /** Proxy URL (e.g. http://user:pass@host:port) to use for this account. */
+  proxy?: string;
 };

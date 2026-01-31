@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import fsSync from "node:fs";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import {
   DisconnectReason,
   fetchLatestBaileysVersion,
@@ -95,7 +96,7 @@ async function safeSaveCreds(
 export async function createWaSocket(
   printQr: boolean,
   verbose: boolean,
-  opts: { authDir?: string; onQr?: (qr: string) => void } = {},
+  opts: { authDir?: string; onQr?: (qr: string) => void; proxyUrl?: string } = {},
 ): Promise<ReturnType<typeof makeWASocket>> {
   const baseLogger = getChildLogger(
     { module: "baileys" },
@@ -110,6 +111,8 @@ export async function createWaSocket(
   maybeRestoreCredsFromBackup(authDir);
   const { state, saveCreds } = await useMultiFileAuthState(authDir);
   const { version } = await fetchLatestBaileysVersion();
+  // @ts-ignore - agent type mismatch between bailey's/ws and agent-base 
+  const agent = opts.proxyUrl ? new HttpsProxyAgent(opts.proxyUrl) : undefined;
   const sock = makeWASocket({
     auth: {
       creds: state.creds,
@@ -121,6 +124,7 @@ export async function createWaSocket(
     browser: ["openclaw", "cli", VERSION],
     syncFullHistory: false,
     markOnlineOnConnect: false,
+    ...(agent ? { agent } : {}),
   });
 
   sock.ev.on("creds.update", () => enqueueSaveCreds(authDir, saveCreds, sessionLogger));

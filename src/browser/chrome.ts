@@ -214,6 +214,9 @@ export async function launchOpenClawChrome(
     if (process.platform === "linux") {
       args.push("--disable-dev-shm-usage");
     }
+    if (profile.proxy) {
+      args.push(`--proxy-server=${profile.proxy}`);
+    }
 
     // Always open a blank tab to ensure a target exists.
     args.push("about:blank");

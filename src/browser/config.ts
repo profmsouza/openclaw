@@ -30,6 +30,7 @@ export type ResolvedBrowserConfig = {
   attachOnly: boolean;
   defaultProfile: string;
   profiles: Record<string, BrowserProfileConfig>;
+  proxy?: string;
 };
 
 export type ResolvedBrowserProfile = {
@@ -40,6 +41,7 @@ export type ResolvedBrowserProfile = {
   cdpIsLoopback: boolean;
   color: string;
   driver: "openclaw" | "extension";
+  proxy?: string;
 };
 
 function isLoopbackHost(host: string) {
@@ -167,10 +169,10 @@ export function resolveBrowserConfig(
   const rawCdpUrl = (cfg?.cdpUrl ?? "").trim();
   let cdpInfo:
     | {
-        parsed: URL;
-        port: number;
-        normalized: string;
-      }
+      parsed: URL;
+      port: number;
+      normalized: string;
+    }
     | undefined;
   if (rawCdpUrl) {
     cdpInfo = parseHttpUrl(rawCdpUrl, "browser.cdpUrl");
@@ -224,6 +226,7 @@ export function resolveBrowserConfig(
     attachOnly,
     defaultProfile,
     profiles,
+    proxy: cfg?.proxy?.trim(),
   };
 }
 
@@ -265,6 +268,7 @@ export function resolveProfile(
     cdpIsLoopback: isLoopbackHost(cdpHost),
     color: profile.color,
     driver,
+    proxy: profile.proxy?.trim() ?? resolved.proxy,
   };
 }
 
