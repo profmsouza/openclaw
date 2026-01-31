@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { securityService } from "../../security/service.js";
 
 import { CURRENT_SESSION_VERSION } from "@mariozechner/pi-coding-agent";
 import { resolveSessionAgentId } from "../../agents/agent-scope.js";
@@ -338,10 +339,10 @@ export const chatHandlers: GatewayRequestHandlers = {
               ? a.content
               : ArrayBuffer.isView(a?.content)
                 ? Buffer.from(
-                    a.content.buffer,
-                    a.content.byteOffset,
-                    a.content.byteLength,
-                  ).toString("base64")
+                  a.content.buffer,
+                  a.content.byteOffset,
+                  a.content.byteLength,
+                ).toString("base64")
                 : undefined,
         }))
         .filter((a) => a.content) ?? [];
@@ -356,6 +357,7 @@ export const chatHandlers: GatewayRequestHandlers = {
     }
     let parsedMessage = p.message;
     let parsedImages: ChatImageContent[] = [];
+
     if (normalizedAttachments.length > 0) {
       try {
         const parsed = await parseMessageWithAttachments(p.message, normalizedAttachments, {
@@ -368,6 +370,21 @@ export const chatHandlers: GatewayRequestHandlers = {
         respond(false, undefined, errorShape(ErrorCodes.INVALID_REQUEST, String(err)));
         return;
       }
+    }
+
+    // Security Scan: Check for Prompt Injection / Malware
+    const securityCheck = securityService.scanInput(parsedMessage);
+    if (!securityCheck.safe) {
+      context.logGateway.warn(`[Security] Blocked message due to: ${securityCheck.reason}`);
+      respond(
+        false,
+        undefined,
+        errorShape(
+          ErrorCodes.INVALID_REQUEST,
+          `Message blocked by security policy: ${securityCheck.reason}`
+        )
+      );
+      return;
     }
     const { cfg, entry } = loadSessionEntry(p.sessionKey);
     const timeoutMs = resolveAgentTimeoutMs({
