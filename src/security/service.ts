@@ -24,28 +24,38 @@ export class SecurityService {
         /\.exe$/i, /\.bat$/i, /\.cmd$/i, /\.sh$/i, /\.vbs$/i, /\.scr$/i
     ];
 
-    public scanInput(text: string): SecurityScanResult {
+    public scanInput(text: string, config?: { enabled?: boolean; promptInjection?: { block?: boolean }; malware?: { scanUrls?: boolean } }): SecurityScanResult {
+        // If strict processing is disabled by config, return safe immediately
+        if (config?.enabled === false) {
+            return { safe: true };
+        }
+
         // 1. Check for prompt injection
-        for (const pattern of this.injectionPatterns) {
-            if (pattern.test(text)) {
-                log.warn(`Prompt injection attempt detected: ${pattern.source}`);
-                return {
-                    safe: false,
-                    reason: "Prompt injection detected",
-                    flaggedContent: text
-                };
+        const checkInjection = config?.promptInjection?.block !== false; // Default to true if undefined
+        if (checkInjection) {
+            for (const pattern of this.injectionPatterns) {
+                if (pattern.test(text)) {
+                    log.warn(`Prompt injection attempt detected: ${pattern.source}`);
+                    return {
+                        safe: false,
+                        reason: "Prompt injection detected",
+                        flaggedContent: text
+                    };
+                }
             }
         }
 
         // 2. Mock Malware Scan (URL/File patterns in text)
-        // In a real scenario, this would call VirusTotal or Google Safe Browsing API
-        if (this.malwarePatterns.some(p => p.test(text))) {
-            log.warn(`Potential malware reference detected.`);
-            return {
-                safe: false,
-                reason: "Potential malware reference detected",
-                flaggedContent: text
-            };
+        const checkMalware = config?.malware?.scanUrls !== false; // Default to true
+        if (checkMalware) {
+            if (this.malwarePatterns.some(p => p.test(text))) {
+                log.warn(`Potential malware reference detected.`);
+                return {
+                    safe: false,
+                    reason: "Potential malware reference detected",
+                    flaggedContent: text
+                };
+            }
         }
 
         return { safe: true };

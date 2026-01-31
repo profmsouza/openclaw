@@ -373,7 +373,9 @@ export const chatHandlers: GatewayRequestHandlers = {
     }
 
     // Security Scan: Check for Prompt Injection / Malware
-    const securityCheck = securityService.scanInput(parsedMessage);
+    const { cfg, entry } = loadSessionEntry(p.sessionKey);
+    const securityCheck = securityService.scanInput(parsedMessage, cfg.security);
+
     if (!securityCheck.safe) {
       context.logGateway.warn(`[Security] Blocked message due to: ${securityCheck.reason}`);
       respond(
@@ -386,7 +388,6 @@ export const chatHandlers: GatewayRequestHandlers = {
       );
       return;
     }
-    const { cfg, entry } = loadSessionEntry(p.sessionKey);
     const timeoutMs = resolveAgentTimeoutMs({
       cfg,
       overrideMs: p.timeoutMs,
