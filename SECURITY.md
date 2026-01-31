@@ -16,7 +16,7 @@ The best way to help the project right now is by sending PRs.
 
 - Public Internet Exposure
 - Using OpenClaw in ways that the docs recommend not to
-- Prompt injection attacks
+
 
 ## Operational Guidance
 
@@ -57,7 +57,22 @@ Example secure Docker run:
 docker run --read-only --cap-drop=ALL \
   -v openclaw-data:/app/data \
   openclaw/openclaw:latest
+  openclaw/openclaw:latest
 ```
+
+## Implemented Defenses
+
+OpenClaw now includes active security measures to protect against common threats:
+
+### Prompt Injection Defense
+A robust `SecurityService` scans all incoming messages for adversarial patterns (e.g., "Ignore previous instructions", "System mode"). Detected attempts are blocked before they reach the agent.
+- **Configurable**: You can toggle this behavior in your `openclaw.json` config under `security.promptInjection`.
+
+### Malware & Link Safety
+The system automatically flags and blocks references to potentially dangerous executable file extensions (e.g., `.exe`, `.bat`, `.vbs`) in user inputs.
+
+### Secure Deployment
+For deployment instructions on platforms like Coolify, refer to [COOLIFY.md](./COOLIFY.md). The official Docker image runs as a non-root user for enhanced security.
 
 ## Security Scanning
 
