@@ -47,4 +47,4 @@ USER node
 EXPOSE 18789
 
 # Default to running the gateway bound to all interfaces
-CMD ["node", "dist/index.js", "gateway", "--bind", "0.0.0.0", "--allow-unconfigured"]
+CMD ["node", "dist/index.js", "gateway", "--bind", "lan", "--allow-unconfigured"]
