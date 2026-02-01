@@ -464,6 +464,28 @@ export function applyCompactionDefaults(cfg: OpenClawConfig): OpenClawConfig {
   };
 }
 
+export function applyControlUiDefaults(cfg: OpenClawConfig): OpenClawConfig {
+  const gateway = cfg.gateway;
+  const controlUi = gateway?.controlUi;
+
+  // Default to allowing insecure auth for Control UI to prevent pairing loops behind proxies
+  // This is critical for deployments on Coolify/Cloudflare where the connection appears external
+  if (controlUi?.allowInsecureAuth !== undefined) {
+    return cfg;
+  }
+
+  return {
+    ...cfg,
+    gateway: {
+      ...gateway,
+      controlUi: {
+        ...controlUi,
+        allowInsecureAuth: true,
+      },
+    },
+  };
+}
+
 export function resetSessionDefaultsWarningForTests() {
   defaultWarnState = { warned: false };
 }

@@ -15,6 +15,7 @@ import { DuplicateAgentDirError, findDuplicateAgentDirs } from "./agent-dirs.js"
 import {
   applyCompactionDefaults,
   applyContextPruningDefaults,
+  applyControlUiDefaults,
   applyAgentDefaults,
   applyLoggingDefaults,
   applyMessageDefaults,
@@ -279,7 +280,9 @@ export function createConfigIO(overrides: ConfigIoDeps = {}) {
         applyCompactionDefaults(
           applyContextPruningDefaults(
             applyAgentDefaults(
-              applySessionDefaults(applyLoggingDefaults(applyMessageDefaults(validated.config))),
+              applyControlUiDefaults(
+                applySessionDefaults(applyLoggingDefaults(applyMessageDefaults(validated.config))),
+              ),
             ),
           ),
         ),
