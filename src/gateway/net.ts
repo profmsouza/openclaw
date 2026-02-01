@@ -77,7 +77,12 @@ export function isTrustedProxyAddress(ip: string | undefined, trustedProxies?: s
   if (!normalized || !trustedProxies || trustedProxies.length === 0) {
     return false;
   }
-  return trustedProxies.some((proxy) => normalizeIp(proxy) === normalized);
+  return trustedProxies.some((proxy) => {
+    if (proxy === "0.0.0.0/0") {
+      return true;
+    }
+    return normalizeIp(proxy) === normalized;
+  });
 }
 
 export function resolveGatewayClientIp(params: {
