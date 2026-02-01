@@ -7,7 +7,7 @@ OpenClaw is optimized to run on Coolify using the provided `Dockerfile`.
 2. Click **"+ New Resource"**.
 3. Select **"Git Based"**.
 4. Choose the repository type:
-   - **For Public Repositories** (like yours): Select **"Public Repository"** (the first option in your screenshot).
+   - **For Public Repositories** (like yours): Select **"Public Repository"**.
      - Enter URL: `https://github.com/profmsouza/openclaw`
    - **For Private Repositories**: Select "Private Repository (with GitHub App)".
 5. Branch: `main`.
@@ -20,12 +20,13 @@ Before deploying, configure the following settings:
 - **Port Exposes**: `18789`.
 
 ### Environment Variables
-Add the following Environment Variables:
+**CRITICAL:** Add the following Environment Variables to ensure connectivity and persistence.
 
 | Key | Value | Description |
 | :--- | :--- | :--- |
-| `OPENCLAW_GATEWAY_TOKEN` | `<random_hex_string>` | Generate a secure random string (e.g. `openssl rand -hex 32`). This is your API Key. |
-| `NODE_ENV` | `production` | Ensures production optimizations. **Note:** The Dockerfile now automatically handles build-time dependencies, so you don't strictly need to uncheck "Available at Build Time" for this var, but it's good practice. |
+| `OPENCLAW_GATEWAY_TOKEN` | `<sua_senha_aqui>` | Define a simple password for access (e.g. `minhasenha123`). This is your API Key. |
+| `OPENCLAW_GATEWAY_TRUSTED_PROXIES` | `0.0.0.0/0` | **REQUIRED** to fix "Untrusted Proxy" errors and WebSocket disconnects on Coolify. |
+| `NODE_ENV` | `production` | Ensures production optimizations. |
 
 ### Storage (Persistent Volumes)
 To preserve your sessions (WhatsApp login) and config across restarts, you **MUST** configure persistent storage.
@@ -36,7 +37,7 @@ To preserve your sessions (WhatsApp login) and config across restarts, you **MUS
    - **Destination Path** (onde os dados ficam no container): `/home/node/.openclaw`
    - **Source Path**: Pode deixar em branco (o Coolify cria automaticamente).
 
-> **Note**: The Docker container runs as the `node` user (UID 1000). Ensure the mounted volume has appropriate permissions if you encounter access issues, though Coolify usually handles this.
+> **Note**: The Docker container now runs as `root` to ensure compatibility with Coolify volumes (`EACCES` fix).
 
 ## 3. Deploy
 Click **"Deploy"**.
@@ -44,7 +45,20 @@ Click **"Deploy"**.
 ## 4. Verification
 Once deployed, the logs should show:
 ```
-[gateway] tcp:18789 listening on 0.0.0.0:18789
+[gateway] listening on 0.0.0.0:18789
 ```
 
-You can then access the interface via the Coolify generated domain (if configured) or IP:18789 using the token `OPENCLAW_GATEWAY_TOKEN`.
+### Accessing the Interface
+Use the following URL format:
+`https://<seu-dominio-coolify>/?token=<sua_senha_aqui>`
+
+Example:
+`https://openclaw.sparklingtech.com.br/?token=minhasenha123`
+
+---
+
+## Troubleshooting ("Force Brute" Reinstall)
+If you need to delete and reinstall:
+1. Delete the resource in Coolify.
+2. Follow the steps above from scratch.
+3. **IMPORTANT**: Do not forget to re-add the `OPENCLAW_GATEWAY_TRUSTED_PROXIES` variable. It is often forgotten during reinstalls and is the main cause of "Offline" errors.

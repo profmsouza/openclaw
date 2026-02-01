@@ -39,10 +39,14 @@ ENV HOME=/home/node
 # Fix permissions for the node user
 RUN chown -R node:node /app
 
+# Create the data directory and ensure specific permissions for the node user
+RUN mkdir -p /home/node/.openclaw && chown -R node:node /home/node/.openclaw
+
 # Security hardening: Run as non-root user
 # The node:22-bookworm image includes a 'node' user (uid 1000)
 # This reduces the attack surface by preventing container escape via root privileges
-USER node
+# Reverted to root to avoid EACCES issues with Coolify volumes
+USER root
 
 EXPOSE 18789
 
