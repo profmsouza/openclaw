@@ -5,8 +5,11 @@ OpenClaw is optimized to run on Coolify using the provided `Dockerfile`.
 ## 1. Create Resource
 1. Go to your Coolify Dashboard -> Projects -> Environment.
 2. Click **"+ New Resource"**.
-3. Select **"Git Based"** -> **"Private Repository (with GitHub App)"** (or Public/Deploy Key).
-4. Select the `openclaw` repository.
+3. Select **"Git Based"**.
+4. Choose the repository type:
+   - **For Public Repositories** (like yours): Select **"Public Repository"** (the first option in your screenshot).
+     - Enter URL: `https://github.com/profmsouza/openclaw`
+   - **For Private Repositories**: Select "Private Repository (with GitHub App)".
 5. Branch: `main`.
 
 ## 2. Configuration (Configuration Screen)
@@ -29,8 +32,9 @@ To preserve your sessions (WhatsApp login) and config across restarts, you **MUS
 
 1. Go to **Storage** tab.
 2. Add a new Persistent Volume:
-   - **Path**: `/home/node/.openclaw`
-   - **Name**: `openclaw-data` (or similar)
+   - **Name**: `openclaw-data`
+   - **Destination Path** (onde os dados ficam no container): `/home/node/.openclaw`
+   - **Source Path**: Pode deixar em branco (o Coolify cria automaticamente).
 
 > **Note**: The Docker container runs as the `node` user (UID 1000). Ensure the mounted volume has appropriate permissions if you encounter access issues, though Coolify usually handles this.
 
